@@ -95,6 +95,8 @@
     <Compile Include="ADGroup.cs" />
     <Compile Include="CMApplication.cs" />
     <Compile Include="CMCollection.cs" />
+    <Compile Include="CMCollectionAdvanced.cs" />
+    <Compile Include="CMDevice.cs" />
     <Compile Include="CMResource.cs" />
     <Compile Include="CMUserDeviceRelation.cs" />
     <Compile Include="IPAddresses.cs" />

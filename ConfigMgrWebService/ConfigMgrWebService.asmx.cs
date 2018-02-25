@@ -1626,8 +1626,6 @@ namespace ConfigMgrWebService
             return folderList;
         }
 
-
-
         [WebMethod(Description = "Update membership of a specific collection")]
         public bool UpdateCMCollectionMembership(string secret, string collectionId)
         {
