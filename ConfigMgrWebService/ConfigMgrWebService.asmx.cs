@@ -1523,6 +1523,114 @@ namespace ConfigMgrWebService
             return collectionList;
         }
 
+        [WebMethod(Description = "Get collection variable for device by Name")]
+        public List<CMCollectionMember> TestCMCollectionMemberByName(string secret, CMCollectionType collectiontype, string[] collectionname = null, string computername = null)
+        {
+            MethodBase method = MethodBase.GetCurrentMethod();
+            MethodBegin(method);
+
+            List<CMCollectionMember> collectionmemberlist = new List<CMCollectionMember>();
+
+            //' Validate secret key
+            if (secret == secretKey)
+            {
+                if (computername != null)
+                {
+                    //' Connect to SMS Provider
+                    SmsProvider smsProvider = new SmsProvider();
+                    WqlConnectionManager connection = smsProvider.Connect(siteServer);
+
+                    string collectionquery = string.Empty;
+
+                    if (collectionname != null || collectionname.All(item => string.IsNullOrEmpty(item)))
+                    {
+                        collectionquery = String.Format("SELECT CollectionID,Name FROM SMS_Collection Where CollectionType='{0:D}' And Name LIKE '%{1}%'", collectiontype, string.Join("%' OR Name LIKE '%", collectionname));
+                    }
+                    else
+                    {
+                        collectionquery = String.Format("SELECT CollectionID,Name FROM SMS_Collection Where CollectionType='{0:D}'", collectiontype);
+                    }
+
+                    IResultObject collectionqueryresult = connection.QueryProcessor.ExecuteQuery(collectionquery);
+
+                    foreach (IResultObject collectionresult in collectionqueryresult)
+                    {
+                        string collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
+
+                        IResultObject collectionmemberqueryresult = connection.QueryProcessor.ExecuteQuery(collectionmemberquery);
+
+                        Boolean IsMember = false;
+
+                        foreach (IResultObject memberresult in collectionmemberqueryresult)
+                        {
+                            if (memberresult["Name"].StringValue == computername)
+                            {
+                                IsMember = true;
+                            }
+                        }
+
+                        CMCollectionMember collectionMember = new CMCollectionMember
+                        {
+                            Name = collectionresult["Name"].StringValue,
+                            CollectionID = collectionresult["CollectionID"].StringValue,
+                            IsMember = IsMember
+                        };
+                        collectionmemberlist.Add(collectionMember);
+                    }
+                }
+            }
+            MethodEnd(method);
+            return collectionmemberlist;
+        }
+
+        [WebMethod(Description = "Get collection variable for device by Name")]
+        public List<CMCollectionMemberByID> TestCMCollectionMemberByID(string secret, CMCollectionType collectiontype, string[] collectionid = null, string computername = null)
+        {
+            MethodBase method = MethodBase.GetCurrentMethod();
+            MethodBegin(method);
+
+            List<CMCollectionMemberByID> collectionmemberlist = new List<CMCollectionMemberByID>();
+
+            //' Validate secret key
+            if (secret == secretKey)
+            {
+                if (computername != null)
+                {
+                    //' Connect to SMS Provider
+                    SmsProvider smsProvider = new SmsProvider();
+                    WqlConnectionManager connection = smsProvider.Connect(siteServer);
+
+                    string collectionquery = string.Empty;
+
+                    foreach (string collid in collectionid)
+                    {
+                        string collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collid);
+
+                        IResultObject collectionmemberqueryresult = connection.QueryProcessor.ExecuteQuery(collectionmemberquery);
+
+                        Boolean IsMember = false;
+
+                        foreach (IResultObject memberresult in collectionmemberqueryresult)
+                        {
+                            if (memberresult["Name"].StringValue == computername)
+                            {
+                                IsMember = true;
+                            }
+                        }
+
+                        CMCollectionMemberByID collectionMember = new CMCollectionMemberByID
+                        {
+                            CollectionID = collid,
+                            IsMember = IsMember
+                        };
+                        collectionmemberlist.Add(collectionMember);
+                    }
+                }
+            }
+            MethodEnd(method);
+            return collectionmemberlist;
+        }
+
         [WebMethod(Description = "Get SCCM Console Node objects")]
         public List<CMNode> GetCMNodeObjects(string secret, CMNodeObjectType objecttype = CMNodeObjectType.SMS_Collection_Device)
         {

@@ -89,4 +89,18 @@ namespace ConfigMgrWebService
         [DataMember]
         public string ExcludeCollectionID { get; set; }
     }
+
+    public class CMCollectionMember
+    {
+        public string Name { get; set; }
+        public string CollectionID { get; set; }
+        public bool IsMember { get; set; }
+    }
+
+    public class CMCollectionMemberByID
+    {
+        public string CollectionID { get; set; }
+        public bool IsMember { get; set; }
+    }
+
 }
