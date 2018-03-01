@@ -28,11 +28,11 @@ namespace ConfigMgrWebService
 	public class CMNode
 	{
 		public string Name { get; set; }
-    		public string ContainerNodeID { get; set; }
-        	public List<string> MemberID { get; set; }
-        	public List<string> MemberGuid { get; set; }
-        	public List<string> InstanceKey { get; set; }
-        	public string ParentContainerNodeID { get; set; }
+    	public string ContainerNodeID { get; set; }
+        public List<string> MemberID { get; set; }
+        public List<string> MemberGuid { get; set; }
+        public List<string> InstanceKey { get; set; }
+        public string ParentContainerNodeID { get; set; }
 		public string FolderGuid { get; set; }
 		public string Path { get; set; }
 	}
