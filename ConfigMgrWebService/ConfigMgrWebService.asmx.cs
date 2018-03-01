@@ -1523,8 +1523,8 @@ namespace ConfigMgrWebService
             return collectionList;
         }
 
-        [WebMethod(Description = "Get collection variable for device by Name")]
-        public List<CMCollectionMember> TestCMCollectionMemberByName(string secret, CMCollectionType collectiontype, string[] collectionname = null, string computername = null)
+        [WebMethod(Description = "Test if device or user is member of collection(s) by Collection Name, username or device name required")]
+        public List<CMCollectionMember> TestCMCollectionMemberByName(string secret, CMCollectionType collectiontype, string[] collectionname = null, string name = null)
         {
             MethodBase method = MethodBase.GetCurrentMethod();
             MethodBegin(method);
@@ -1534,7 +1534,7 @@ namespace ConfigMgrWebService
             //' Validate secret key
             if (secret == secretKey)
             {
-                if (computername != null)
+                if (name != null)
                 {
                     //' Connect to SMS Provider
                     SmsProvider smsProvider = new SmsProvider();
@@ -1555,7 +1555,16 @@ namespace ConfigMgrWebService
 
                     foreach (IResultObject collectionresult in collectionqueryresult)
                     {
-                        string collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
+                        string collectionmemberquery = string.Empty;
+
+                        if (collectiontype == CMCollectionType.DeviceCollection)
+                        {
+                            collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
+                        }
+                        else
+                        {
+                            collectionmemberquery = String.Format("SELECT SMSID FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
+                        }
 
                         IResultObject collectionmemberqueryresult = connection.QueryProcessor.ExecuteQuery(collectionmemberquery);
 
@@ -1563,9 +1572,21 @@ namespace ConfigMgrWebService
 
                         foreach (IResultObject memberresult in collectionmemberqueryresult)
                         {
-                            if (memberresult["Name"].StringValue == computername)
+                            if (collectiontype == CMCollectionType.DeviceCollection)
                             {
-                                IsMember = true;
+                                if (memberresult["Name"].StringValue == name)
+                                {
+                                    IsMember = true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (memberresult["SMSID"].StringValue == name)
+                                {
+                                    IsMember = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -1583,8 +1604,8 @@ namespace ConfigMgrWebService
             return collectionmemberlist;
         }
 
-        [WebMethod(Description = "Get collection variable for device by Name")]
-        public List<CMCollectionMemberByID> TestCMCollectionMemberByID(string secret, CMCollectionType collectiontype, string[] collectionid = null, string computername = null)
+        [WebMethod(Description = "Test if device or user is member of collection(s) by Collection ID, username or device name required")]
+        public List<CMCollectionMemberByID> TestCMCollectionMemberByID(string secret, CMCollectionType collectiontype, string[] collectionid = null, string name = null)
         {
             MethodBase method = MethodBase.GetCurrentMethod();
             MethodBegin(method);
@@ -1594,7 +1615,7 @@ namespace ConfigMgrWebService
             //' Validate secret key
             if (secret == secretKey)
             {
-                if (computername != null)
+                if (name != null)
                 {
                     //' Connect to SMS Provider
                     SmsProvider smsProvider = new SmsProvider();
@@ -1604,7 +1625,16 @@ namespace ConfigMgrWebService
 
                     foreach (string collid in collectionid)
                     {
-                        string collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collid);
+                        string collectionmemberquery = string.Empty;
+
+                        if (collectiontype == CMCollectionType.DeviceCollection)
+                        {
+                            collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collid);
+                        }
+                        else
+                        {
+                            collectionmemberquery = String.Format("SELECT SMSID FROM SMS_CollectionMember_a Where CollectionID='{0}'", collid);
+                        }
 
                         IResultObject collectionmemberqueryresult = connection.QueryProcessor.ExecuteQuery(collectionmemberquery);
 
@@ -1612,9 +1642,21 @@ namespace ConfigMgrWebService
 
                         foreach (IResultObject memberresult in collectionmemberqueryresult)
                         {
-                            if (memberresult["Name"].StringValue == computername)
+                            if (collectiontype == CMCollectionType.DeviceCollection)
                             {
-                                IsMember = true;
+                                if (memberresult["Name"].StringValue == name)
+                                {
+                                    IsMember = true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (memberresult["SMSID"].StringValue == name)
+                                {
+                                    IsMember = true;
+                                    break;
+                                }
                             }
                         }
 
