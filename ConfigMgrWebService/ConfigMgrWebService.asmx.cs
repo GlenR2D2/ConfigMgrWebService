@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -1607,32 +1607,22 @@ namespace ConfigMgrWebService
             return collectionList;
         }
 
-<<<<<<< HEAD
         [WebMethod(Description = "Get collection variable and adhesion rule for filtered collection or all collections")]
         [XmlInclude(typeof(CMQueryRule))]
         [XmlInclude(typeof(CMDirectRule))]
         [XmlInclude(typeof(CMIncludeRule))]
         [XmlInclude(typeof(CMExcludeRule))]
         public List<CMCollectionAdvanced> GetCMCollectionAdvancedByPath(string secret, CMCollectionType collectiontype, string objectpath = null)
-=======
-        [WebMethod(Description = "Test if device or user is member of collection(s) by Collection Name, username or device name required")]
-        public List<CMCollectionMember> TestCMCollectionMemberByName(string secret, CMCollectionType collectiontype, string[] collectionname = null, string name = null)
->>>>>>> daeaddcf007eb69ffa9097d76a3506ca744398dd
         {
             MethodBase method = MethodBase.GetCurrentMethod();
             MethodBegin(method);
 
-<<<<<<< HEAD
             //' Construct list object
             List<CMCollectionAdvanced> collectionList = new List<CMCollectionAdvanced>();
-=======
-            List<CMCollectionMember> collectionmemberlist = new List<CMCollectionMember>();
->>>>>>> daeaddcf007eb69ffa9097d76a3506ca744398dd
 
             //' Validate secret key
             if (secret == secretKey)
             {
-<<<<<<< HEAD
                 //' Connect to SMS Provider
                 SmsProvider smsProvider = new SmsProvider();
                 WqlConnectionManager connection = smsProvider.Connect(siteServer);
@@ -1681,65 +1671,10 @@ namespace ConfigMgrWebService
                                         Value = varobject["Value"].StringValue
                                     };
                                     allvariables.Add(tmpvar);
-=======
-                if (name != null)
-                {
-                    //' Connect to SMS Provider
-                    SmsProvider smsProvider = new SmsProvider();
-                    WqlConnectionManager connection = smsProvider.Connect(siteServer);
-
-                    string collectionquery = string.Empty;
-
-                    if (collectionname != null || collectionname.All(item => string.IsNullOrEmpty(item)))
-                    {
-                        collectionquery = String.Format("SELECT CollectionID,Name FROM SMS_Collection Where CollectionType='{0:D}' And Name LIKE '%{1}%'", collectiontype, string.Join("%' OR Name LIKE '%", collectionname));
-                    }
-                    else
-                    {
-                        collectionquery = String.Format("SELECT CollectionID,Name FROM SMS_Collection Where CollectionType='{0:D}'", collectiontype);
-                    }
-
-                    IResultObject collectionqueryresult = connection.QueryProcessor.ExecuteQuery(collectionquery);
-
-                    foreach (IResultObject collectionresult in collectionqueryresult)
-                    {
-                        string collectionmemberquery = string.Empty;
-
-                        if (collectiontype == CMCollectionType.DeviceCollection)
-                        {
-                            collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
-                        }
-                        else
-                        {
-                            collectionmemberquery = String.Format("SELECT SMSID FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
-                        }
-
-                        IResultObject collectionmemberqueryresult = connection.QueryProcessor.ExecuteQuery(collectionmemberquery);
-
-                        Boolean IsMember = false;
-
-                        foreach (IResultObject memberresult in collectionmemberqueryresult)
-                        {
-                            if (collectiontype == CMCollectionType.DeviceCollection)
-                            {
-                                if (memberresult["Name"].StringValue == name)
-                                {
-                                    IsMember = true;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                if (memberresult["SMSID"].StringValue == name)
-                                {
-                                    IsMember = true;
-                                    break;
->>>>>>> daeaddcf007eb69ffa9097d76a3506ca744398dd
                                 }
                             }
                         }
 
-<<<<<<< HEAD
                         CMVariablesSettings collectionsproperties = new CMVariablesSettings
                         {
                             CollectionID = collectionsettings["CollectionID"].StringValue,
@@ -1797,7 +1732,99 @@ namespace ConfigMgrWebService
                                         ExcludeCollectionID = collectionrule["ExcludeCollectionID"].StringValue
                                     };
                                     collectionrulelist.Add(tmpcollectionrule);
-=======
+                                }
+                            }
+                        }
+
+                        foreach (CMVariablesSettings collsetting in collectionssettings)
+                        {
+                            if (collsetting.CollectionID == tmpcollectionlist["CollectionID"].StringValue)
+                            {
+                                CMCollectionAdvanced tmpcollectionadvanced = new CMCollectionAdvanced
+                                {
+                                    Name = tmpcollectionlist["Name"].StringValue,
+                                    CollectionID = tmpcollectionlist["CollectionID"].StringValue,
+                                    Variable = collsetting.Variable,
+                                    AdhesionRules = collectionrulelist
+                                };
+                                collectionList.Add(tmpcollectionadvanced);
+                            }
+                        }
+                    }
+                }
+            }
+
+            MethodEnd(method);
+            return collectionList;
+        }
+
+        [WebMethod(Description = "Test if device or user is member of collection(s) by Collection Name, username or device name required")]
+        public List<CMCollectionMember> TestCMCollectionMemberByName(string secret, CMCollectionType collectiontype, string[] collectionname = null, string name = null)
+        {
+            MethodBase method = MethodBase.GetCurrentMethod();
+            MethodBegin(method);
+
+            List<CMCollectionMember> collectionmemberlist = new List<CMCollectionMember>();
+
+            //' Validate secret key
+            if (secret == secretKey)
+            {
+                if (name != null)
+                {
+                    //' Connect to SMS Provider
+                    SmsProvider smsProvider = new SmsProvider();
+                    WqlConnectionManager connection = smsProvider.Connect(siteServer);
+
+                    string collectionquery = string.Empty;
+
+                    if (collectionname != null || collectionname.All(item => string.IsNullOrEmpty(item)))
+                    {
+                        collectionquery = String.Format("SELECT CollectionID,Name FROM SMS_Collection Where CollectionType='{0:D}' And Name LIKE '%{1}%'", collectiontype, string.Join("%' OR Name LIKE '%", collectionname));
+                    }
+                    else
+                    {
+                        collectionquery = String.Format("SELECT CollectionID,Name FROM SMS_Collection Where CollectionType='{0:D}'", collectiontype);
+                    }
+
+                    IResultObject collectionqueryresult = connection.QueryProcessor.ExecuteQuery(collectionquery);
+
+                    foreach (IResultObject collectionresult in collectionqueryresult)
+                    {
+                        string collectionmemberquery = string.Empty;
+
+                        if (collectiontype == CMCollectionType.DeviceCollection)
+                        {
+                            collectionmemberquery = String.Format("SELECT Name FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
+                        }
+                        else
+                        {
+                            collectionmemberquery = String.Format("SELECT SMSID FROM SMS_CollectionMember_a Where CollectionID='{0}'", collectionresult["CollectionID"].StringValue);
+                        }
+
+                        IResultObject collectionmemberqueryresult = connection.QueryProcessor.ExecuteQuery(collectionmemberquery);
+
+                        Boolean IsMember = false;
+
+                        foreach (IResultObject memberresult in collectionmemberqueryresult)
+                        {
+                            if (collectiontype == CMCollectionType.DeviceCollection)
+                            {
+                                if (memberresult["Name"].StringValue == name)
+                                {
+                                    IsMember = true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (memberresult["SMSID"].StringValue == name)
+                                {
+                                    IsMember = true;
+                                    break;
+                                }
+                            }
+                        }
+
                         CMCollectionMember collectionMember = new CMCollectionMember
                         {
                             Name = collectionresult["Name"].StringValue,
@@ -1864,33 +1891,10 @@ namespace ConfigMgrWebService
                                 {
                                     IsMember = true;
                                     break;
->>>>>>> daeaddcf007eb69ffa9097d76a3506ca744398dd
                                 }
                             }
                         }
 
-<<<<<<< HEAD
-                        foreach (CMVariablesSettings collsetting in collectionssettings)
-                        {
-                            if (collsetting.CollectionID == tmpcollectionlist["CollectionID"].StringValue)
-                            {
-                                CMCollectionAdvanced tmpcollectionadvanced = new CMCollectionAdvanced
-                                {
-                                    Name = tmpcollectionlist["Name"].StringValue,
-                                    CollectionID = tmpcollectionlist["CollectionID"].StringValue,
-                                    Variable = collsetting.Variable,
-                                    AdhesionRules = collectionrulelist
-                                };
-                                collectionList.Add(tmpcollectionadvanced);
-                            }
-                        }
-                    }
-                }
-            }
-
-            MethodEnd(method);
-            return collectionList;
-=======
                         CMCollectionMemberByID collectionMember = new CMCollectionMemberByID
                         {
                             CollectionID = collid,
@@ -1902,7 +1906,6 @@ namespace ConfigMgrWebService
             }
             MethodEnd(method);
             return collectionmemberlist;
->>>>>>> daeaddcf007eb69ffa9097d76a3506ca744398dd
         }
 
         [WebMethod(Description = "Get SCCM Console Node objects")]
@@ -1922,8 +1925,8 @@ namespace ConfigMgrWebService
                 WqlConnectionManager connection = smsProvider.Connect(siteServer);
 
                 //' folders query
-                string deviceFolderNodesQuery = String.Format("Select * From SMS_ObjectContainerNode Where ObjectType='{0:D}'", objecttype);
-                string deviceFolderItemsQuery = String.Format("Select * From SMS_ObjectContainerItem Where ObjectType='{0:D}'", objecttype);
+                string deviceFolderNodesQuery = String.Format("Select ContainerNodeID,Name,ParentContainerNodeID,FolderGuid From SMS_ObjectContainerNode Where ObjectType='{0:D}'", objecttype);
+                string deviceFolderItemsQuery = String.Format("Select ContainerNodeID,MemberID,MemberGuid,InstanceKey From SMS_ObjectContainerItem Where ObjectType='{0:D}'", objecttype);
 
                 //
                 IResultObject foldernodes = connection.QueryProcessor.ExecuteQuery(deviceFolderNodesQuery);
